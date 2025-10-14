@@ -6,7 +6,9 @@ import { Select, NumberInput, TextInput, Checkbox } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { GoodBoyIcon } from '@/components/GoodBoyIcon';
 import { FacebookIcon, InstagramIcon } from '@/components/SocialIcons';
+import Footer from '@/components/Footer';
 import { donationFormSchema } from '@/lib/validation';
+import Link from 'next/link';
 
 export default function Home() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -711,33 +713,7 @@ export default function Home() {
 
                     </div>
             
-                    <div className="pt-1">
-                      <div className="px-12">
-                        <div className="border-t border-gray-200 pt-4">
-                        <div className="flex justify-between items-center">
-                        <div className="flex items-center text-2xl text-gray-900">
-                          <GoodBoyIcon className="w-8 h-8" />
-                          <span className="ml-2 font-bold">Good boy</span>
-                        </div>
-                        
-                        <div className="flex items-center space-x-6">
-                          <div className="flex space-x-2">
-                            <div className="text-gray-400 hover:text-gray-600 transition-colors">
-                              <FacebookIcon className="w-5 h-5" />
-                            </div>
-                            <div className="text-gray-400 hover:text-gray-600 transition-colors">
-                              <InstagramIcon className="w-5 h-5" />
-                            </div>
-                          </div>
-                          <div className="flex space-x-6 text-base text-gray-500">
-                            <a href="/contact" className="hover:text-gray-700">Kontakt</a>
-                            <a href="/about" className="hover:text-gray-700">O projekte</a>
-                          </div>
-                        </div>
-                        </div>
-                        </div>
-                      </div>
-                    </div>
+                    <Footer />
           </div>
 
                   <div className="lg:col-span-2">
