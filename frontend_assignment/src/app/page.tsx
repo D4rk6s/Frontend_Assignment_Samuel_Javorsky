@@ -183,9 +183,7 @@ export default function Home() {
                     }`}>Výber útulku</span>
                   </div>
                   
-                  <div className={`flex-1 h-px mx-4 ${
-                    currentStep >= 2 ? 'bg-[#4F46E5]' : 'bg-gray-300'
-                  }`}></div>
+                  <div className="flex-1 h-px mx-4 bg-[#D1D5DB]"></div>
                   
                   <div className="flex items-center">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -206,9 +204,7 @@ export default function Home() {
                     }`}>Osobné údaje</span>
                   </div>
                   
-                  <div className={`flex-1 h-px mx-4 ${
-                    currentStep >= 3 ? 'bg-[#4F46E5]' : 'bg-gray-300'
-                  }`}></div>
+                  <div className="flex-1 h-px mx-4 bg-[#D1D5DB]"></div>
                   
                   <div className="flex items-center">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${

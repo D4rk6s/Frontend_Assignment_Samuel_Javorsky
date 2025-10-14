@@ -10,10 +10,10 @@ export default function KontaktPage() {
         <div className="mb-8">
           <Link 
             href="/" 
-            className="flex items-center text-[#4F46E5] hover:text-[#3B3B9A] transition-colors mb-4"
+            className="flex items-center text-[#4F46E5] hover:text-[#3B3B9A] transition-colors mb-4 text-lg"
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-2">
-              <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-2">
+              <path d="M14.6668 6H1.3335M1.3335 6L6.3335 11M1.3335 6L6.3335 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             Späť
           </Link>
