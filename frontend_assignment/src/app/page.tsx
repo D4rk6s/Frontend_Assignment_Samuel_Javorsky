@@ -14,7 +14,7 @@ import { useAppStore } from '@/store/appStore';
 import Link from 'next/link';
 
 export default function Home() {
-  const { currentStep, setCurrentStep, nextStep, previousStep, setSubmitting, isSubmitting } = useAppStore();
+  const { currentStep, setCurrentStep, nextStep, previousStep, setSubmitting, isSubmitting, theme, toggleTheme } = useAppStore();
   
   const form = useForm<DonationFormData>({
     resolver: zodResolver(donationFormSchema),
@@ -145,13 +145,30 @@ export default function Home() {
   };
 
   return (
-            <div className="min-h-screen bg-white">
+            <div className={`min-h-screen transition-colors duration-300 ${theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
               <div className="max-w-none mx-auto px-8 py-2">
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 h-[95vh]">
                   
-                  <div className="lg:col-span-3 flex flex-col h-[95vh]">
+                  <div className="lg:col-span-3 flex flex-col h-[95vh] relative">
+                    <button
+                      onClick={toggleTheme}
+                      className="absolute top-4 right-4 p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200 z-10"
+                      title={theme === 'light' ? 'Prepnúť na tmavý režim' : 'Prepnúť na svetlý režim'}
+                    >
+                      {theme === 'light' ? (
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-gray-700 dark:text-gray-300">
+                          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      ) : (
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-gray-700 dark:text-gray-300">
+                          <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2"/>
+                          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        </svg>
+                      )}
+                    </button>
                     <div className="p-12 h-full flex flex-col">
               
+
               <div className="h-20 flex items-center mb-8">
                 <div className="flex items-center w-full">
                   <div className="flex items-center">
@@ -168,8 +185,8 @@ export default function Home() {
                         ) : '1'}
                       </span>
                     </div>
-                    <span className={`ml-3 text-sm font-semibold ${
-                      currentStep >= 1 ? 'text-gray-900' : 'text-gray-400'
+                    <span className={`ml-3 text-sm font-semibold transition-colors duration-300 ${
+                      currentStep >= 1 ? (theme === 'dark' ? 'text-white' : 'text-gray-900') : 'text-gray-400'
                     }`}>Výber útulku</span>
                   </div>
                   
@@ -189,8 +206,8 @@ export default function Home() {
                         ) : '2'}
                       </span>
                     </div>
-                    <span className={`ml-3 text-sm font-semibold ${
-                      currentStep >= 2 ? 'text-gray-900' : 'text-gray-400'
+                    <span className={`ml-3 text-sm font-semibold transition-colors duration-300 ${
+                      currentStep >= 2 ? (theme === 'dark' ? 'text-white' : 'text-gray-900') : 'text-gray-400'
                     }`}>Osobné údaje</span>
                   </div>
                   
@@ -204,8 +221,8 @@ export default function Home() {
                         currentStep === 3 ? 'text-white' : 'text-gray-500'
                       }`}>3</span>
                     </div>
-                    <span className={`ml-3 text-sm font-semibold ${
-                      currentStep >= 3 ? 'text-gray-900' : 'text-gray-400'
+                    <span className={`ml-3 text-sm font-semibold transition-colors duration-300 ${
+                      currentStep >= 3 ? (theme === 'dark' ? 'text-white' : 'text-gray-900') : 'text-gray-400'
                     }`}>Potvrdenie</span>
                   </div>
                 </div>
@@ -213,7 +230,7 @@ export default function Home() {
 
                       <div className="h-16 flex items-center mb-6">
                         {currentStep === 1 && (
-                          <h1 className="text-gray-900" style={{ 
+                          <h1 className={`transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`} style={{ 
                             fontFamily: 'Inter, sans-serif',
                             fontWeight: 700,
                             fontSize: '48px',
@@ -225,7 +242,7 @@ export default function Home() {
                         )}
 
                         {currentStep === 2 && (
-                          <h1 className="text-gray-900" style={{ 
+                          <h1 className={`transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`} style={{ 
                             fontFamily: 'Inter, sans-serif',
                             fontWeight: 700,
                             fontSize: '48px',
@@ -237,7 +254,7 @@ export default function Home() {
                         )}
 
                         {currentStep === 3 && (
-                          <h1 className="text-gray-900" style={{ 
+                          <h1 className={`transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`} style={{ 
                             fontFamily: 'Inter, sans-serif',
                             fontWeight: 700,
                             fontSize: '48px',
@@ -261,7 +278,9 @@ export default function Home() {
                               className={`flex-1 py-4 px-6 rounded-xl border-2 transition-colors ${
                                 donationType === 'shelter'
                                   ? 'text-white border-[#4F46E5]'
-                                  : 'text-gray-700 border-gray-300 hover:border-gray-400'
+                                  : theme === 'dark' 
+                                    ? 'text-white border-gray-600 hover:border-gray-500' 
+                                    : 'text-gray-700 border-gray-300 hover:border-gray-400'
                               }`}
                               style={{ 
                                 backgroundColor: donationType === 'shelter' ? '#4F46E5' : undefined,
@@ -283,7 +302,9 @@ export default function Home() {
                               className={`flex-1 py-4 px-6 rounded-xl border-2 transition-colors ${
                                 donationType === 'general'
                                   ? 'text-white border-[#4F46E5]'
-                                  : 'text-gray-700 border-gray-300 hover:border-gray-400'
+                                  : theme === 'dark' 
+                                    ? 'text-white border-gray-600 hover:border-gray-500' 
+                                    : 'text-gray-700 border-gray-300 hover:border-gray-400'
                               }`}
                               style={{ 
                                 backgroundColor: donationType === 'general' ? '#4F46E5' : undefined,
@@ -303,21 +324,21 @@ export default function Home() {
 
                       {currentStep === 1 && (
                         <div className="mb-6">
-                          <h3 className="text-gray-900 mb-4" style={{
+                          <h3 className={`transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-4`} style={{
                             fontFamily: 'Inter, sans-serif',
                             fontWeight: 600,
                             fontSize: '16px',
                             lineHeight: '24px',
                             letterSpacing: '0px'
                           }}>O projekte</h3>
-                          <label className="text-gray-900 mb-1 block" style={{
+                          <label className={`transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-1 block`} style={{
                             fontFamily: 'Inter, sans-serif',
                             fontWeight: 500,
                             fontSize: '14px',
                             lineHeight: '20px',
                             letterSpacing: '0px',
                           }}>
-                            Útulok {donationType === 'general' && <span className="text-gray-500 font-normal">(Nepovinné)</span>}
+                            Útulok {donationType === 'general' && <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} font-normal`}>(Nepovinné)</span>}
                           </label>
                           <Select
                             placeholder="Vyberte útulok zo zoznamu"
@@ -344,7 +365,7 @@ export default function Home() {
 
                       {currentStep === 1 && (
                         <div className="mb-6">
-                          <h3 className="text-gray-900 mb-6" style={{
+                          <h3 className={`transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-6`} style={{
                             fontFamily: 'Inter, sans-serif',
                             fontWeight: 600,
                             fontSize: '16px',
@@ -355,17 +376,17 @@ export default function Home() {
                           </h3>
                           
                           <div className="mb-6">
-                            <div className="flex items-center justify-center text-4xl font-bold text-gray-900 pb-2">
+                            <div className={`flex items-center justify-center text-4xl font-bold pb-2 transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                               <div className="border-b-2 border-[#4F46E5] px-2 pb-1">
                                 <input
                                   type="number"
                                   value={customAmount || amount}
                                   onChange={(e) => handleCustomAmountChange(e.target.value)}
-                                  className={`bg-transparent border-none outline-none text-4xl font-bold w-28 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${(customAmount || amount) === 0 ? 'text-gray-400' : 'text-gray-900'}`}
+                                  className={`bg-transparent border-none outline-none text-4xl font-bold w-28 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors duration-300 ${(customAmount || amount) === 0 ? (theme === 'dark' ? 'text-gray-500' : 'text-gray-400') : (theme === 'dark' ? 'text-white' : 'text-gray-900')}`}
                                   placeholder="0"
                                   min="1"
                                 />
-                                <span className="ml-2 text-2xl">€</span>
+                                <span className={`ml-2 text-2xl transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>€</span>
                               </div>
                             </div>
                           </div>
@@ -378,7 +399,9 @@ export default function Home() {
                                 className={`py-1.5 px-1 rounded-lg border-2 transition-colors font-semibold text-sm ${
                                   amount === predefinedAmount && !customAmount
                                     ? 'text-white border-[#4F46E5]'
-                                    : 'text-gray-700 border-gray-300 hover:border-gray-400'
+                                    : theme === 'dark'
+                                      ? 'text-white border-gray-600 hover:border-gray-500'
+                                      : 'text-gray-700 border-gray-300 hover:border-gray-400'
                                 }`}
                                 style={{ backgroundColor: amount === predefinedAmount && !customAmount ? '#4F46E5' : undefined }}
                               >
@@ -395,7 +418,7 @@ export default function Home() {
                       {currentStep === 2 && (
                         <div className="mb-6">
                           <div className="mb-6">
-                            <h3 className="text-gray-900 mb-4" style={{
+                            <h3 className={`transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-4`} style={{
                               fontFamily: 'Inter, sans-serif',
                               fontWeight: 600,
                               fontSize: '16px',
@@ -404,7 +427,7 @@ export default function Home() {
                             }}>O vás</h3>
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <label className="text-gray-900 mb-1 block" style={{
+                                <label className={`transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-1 block`} style={{
                                   fontFamily: 'Inter, sans-serif',
                                   fontWeight: 500,
                                   fontSize: '14px',
@@ -422,7 +445,7 @@ export default function Home() {
                                 />
                               </div>
                               <div>
-                                <label className="text-gray-900 mb-1 block" style={{
+                                <label className={`transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-1 block`} style={{
                                   fontFamily: 'Inter, sans-serif',
                                   fontWeight: 500,
                                   fontSize: '14px',
@@ -443,7 +466,7 @@ export default function Home() {
                           </div>
 
                           <div className="mb-6">
-                            <label className="text-gray-900 mb-1 block" style={{
+                            <label className={`transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-1 block`} style={{
                               fontFamily: 'Inter, sans-serif',
                               fontWeight: 500,
                               fontSize: '14px',
@@ -462,7 +485,7 @@ export default function Home() {
                           </div>
 
                           <div className="mb-6">
-                            <label className="text-gray-900 mb-1 block" style={{
+                            <label className={`transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-1 block`} style={{
                               fontFamily: 'Inter, sans-serif',
                               fontWeight: 500,
                               fontSize: '14px',
@@ -572,11 +595,11 @@ export default function Home() {
                       {currentStep === 3 && (
                         <div className="space-y-8">
                           <div className="space-y-6">
-                            <h3 className="text-lg font-semibold text-gray-900">Zhrnutie</h3>
+                            <h3 className={`text-lg font-semibold transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Zhrnutie</h3>
                             <div className="space-y-4">
                               <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Forma pomoci</span>
-                                <span className="font-medium text-gray-900">
+                                <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Forma pomoci</span>
+                                <span className={`font-medium transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                   {donationType === 'general' 
                                     ? 'Finančný príspevok celej nadácii' 
                                     : 'Finančný príspevok konkrétnemu útulku'
@@ -585,37 +608,37 @@ export default function Home() {
                               </div>
                               {donationType === 'shelter' && selectedShelter && (
                                 <div className="flex justify-between items-center">
-                                  <span className="text-gray-600">Útulok</span>
-                                  <span className="font-medium text-gray-900">{selectedShelter}</span>
+                                  <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Útulok</span>
+                                  <span className={`font-medium transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{selectedShelter}</span>
                                 </div>
                               )}
                               <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Suma príspevku</span>
-                                <span className="font-medium text-gray-900">
+                                <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Suma príspevku</span>
+                                <span className={`font-medium transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                   {customAmount ? `${customAmount} €` : `${amount} €`}
                                 </span>
                               </div>
                             </div>
                           </div>
 
-                          <div className="border-t border-gray-200 pt-6">
+                          <div className={`border-t pt-6 transition-colors duration-300 ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
                             <div className="space-y-4">
                               <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Meno a priezvisko</span>
-                                <span className="font-medium text-gray-900">{firstName} {lastName}</span>
+                                <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Meno a priezvisko</span>
+                                <span className={`font-medium transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{firstName} {lastName}</span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="text-gray-600">E-mail</span>
-                                <span className="font-medium text-gray-900">{email}</span>
+                                <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>E-mail</span>
+                                <span className={`font-medium transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{email}</span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Telefónne číslo</span>
-                                <span className="font-medium text-gray-900">{countryCode} {phone}</span>
+                                <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Telefónne číslo</span>
+                                <span className={`font-medium transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{countryCode} {phone}</span>
                               </div>
                             </div>
                           </div>
 
-                          <div className="border-t border-gray-200 pt-4">
+                          <div className={`border-t pt-4 transition-colors duration-300 ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
                             <Checkbox
                               checked={consent}
                               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -628,18 +651,18 @@ export default function Home() {
                                 label: {
                                   fontSize: '14px',
                                   lineHeight: '20px',
-                                  color: '#374151'
+                                  color: theme === 'dark' ? '#ffffff' : '#374151'
                                 },
                                 input: {
-                                  backgroundColor: consent ? '#f3f4f6' : 'white',
+                                  backgroundColor: theme === 'dark' ? (consent ? '#374151' : '#1f2937') : (consent ? '#f3f4f6' : 'white'),
                                   borderColor: '#4F46E5',
                                   '&:checked': {
-                                    backgroundColor: '#f3f4f6',
+                                    backgroundColor: theme === 'dark' ? '#374151' : '#f3f4f6',
                                     borderColor: '#4F46E5'
                                   }
                                 },
                                 icon: {
-                                  color: '#4F46E5'
+                                  color: theme === 'dark' ? '#ffffff' : '#4F46E5'
                                 }
                               }}
                             />
@@ -652,7 +675,11 @@ export default function Home() {
                         <button
                           onClick={handlePrevious}
                           disabled={currentStep === 1}
-                          className="flex items-center px-6 py-3 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className={`flex items-center px-6 py-3 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+                            theme === 'dark' 
+                              ? 'text-white bg-gray-700 hover:bg-gray-600' 
+                              : 'text-gray-600 bg-gray-100 hover:bg-gray-200'
+                          }`}
                           style={{
                             fontFamily: 'Inter, sans-serif',
                             fontWeight: 500,

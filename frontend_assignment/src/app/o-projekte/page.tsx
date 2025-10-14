@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { api, DonationStats } from '@/lib/api';
+import { useAppStore } from '@/store/appStore';
 
 export default function OProjektePage() {
+  const { theme, toggleTheme } = useAppStore();
   const [stats, setStats] = useState<DonationStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,27 +30,46 @@ export default function OProjektePage() {
     fetchStats();
   }, []);
   return (
-    <div className="min-h-screen bg-white">
+    <div className={`min-h-screen transition-colors duration-300 ${theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
       <div className="max-w-7xl mx-auto px-8 py-8">
         <div className="mb-8">
-          <Link 
-            href="/" 
-            className="flex items-center text-[#4F46E5] hover:text-[#3B3B9A] transition-colors mb-4 text-lg"
-          >
-            <svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-2">
-              <path d="M14.6668 6H1.3335M1.3335 6L6.3335 11M1.3335 6L6.3335 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            Späť
-          </Link>
+          <div className="flex justify-between items-start mb-4">
+            <Link 
+              href="/" 
+              className="flex items-center text-[#4F46E5] hover:text-[#3B3B9A] transition-colors text-lg"
+            >
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-2">
+                <path d="M14.6668 6H1.3335M1.3335 6L6.3335 11M1.3335 6L6.3335 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Späť
+            </Link>
+            
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200"
+              title={theme === 'light' ? 'Prepnúť na tmavý režim' : 'Prepnúť na svetlý režim'}
+            >
+              {theme === 'light' ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-gray-700 dark:text-gray-300">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-gray-700 dark:text-gray-300">
+                  <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              )}
+            </button>
+          </div>
           
-          <h1 className="text-5xl font-bold text-gray-900 mb-12">
+          <h1 className={`text-5xl font-bold mb-12 transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             O projekte
           </h1>
         </div>
 
         <div className="max-w-6xl">
           <div className="mb-8">
-            <p className="text-lg text-gray-900 leading-relaxed mb-6 text-left">
+            <p className={`text-lg leading-relaxed mb-6 text-left transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
               Nadácia Good Boy sa venuje zlepšovaniu života psov v Žiline na Slovensku. 
               Zachraňujeme opustené, týrané a bezdomovské psy, poskytujeme im lekársku 
               starostlivosť, útočisko a lásku, ktorú si zaslúžia. Naším poslaním je dať 
@@ -59,7 +80,7 @@ export default function OProjektePage() {
             </p>
           </div>
 
-          <div className="border-t border-b border-gray-300 py-12 mb-12">
+          <div className={`border-t border-b py-12 mb-12 transition-colors duration-300 ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <div className="text-center">
                 <div className="text-6xl font-bold text-[#4F46E5] mb-2">
@@ -71,7 +92,7 @@ export default function OProjektePage() {
                     `${stats?.contribution?.toLocaleString('sk-SK') || '0'} €`
                   )}
                 </div>
-                <p className="text-lg text-gray-600">
+                <p className={`text-lg transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                   Celková vyzbieraná hodnota
                 </p>
               </div>
@@ -86,7 +107,7 @@ export default function OProjektePage() {
                     stats?.contributors?.toLocaleString('sk-SK') || '0'
                   )}
                 </div>
-                <p className="text-lg text-gray-600">
+                <p className={`text-lg transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                   Počet darcov
                 </p>
               </div>
@@ -94,7 +115,7 @@ export default function OProjektePage() {
           </div>
 
           <div className="mb-16">
-            <p className="text-lg text-gray-900 leading-relaxed text-left">
+            <p className={`text-lg leading-relaxed text-left transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
               Naša práca je možná vďaka podpore vášnivých dobrovoľníkov, štedrých darcov a 
               komunity, ktorá sa hlboko stará o dobro zvierat. Organizujeme aj kastračné a 
               sterilizačné iniciatívy, aby sme riešili problém túlavých psov a zabezpečili 
