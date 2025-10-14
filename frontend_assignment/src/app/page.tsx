@@ -8,6 +8,7 @@ import { GoodBoyIcon } from '@/components/GoodBoyIcon';
 import { FacebookIcon, InstagramIcon } from '@/components/SocialIcons';
 import Footer from '@/components/Footer';
 import { donationFormSchema } from '@/lib/validation';
+import { api } from '@/lib/api';
 import Link from 'next/link';
 
 export default function Home() {
@@ -94,7 +95,7 @@ export default function Home() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep === 1) {
       if (validateStep(1)) {
         setCurrentStep(2);
@@ -111,20 +112,31 @@ export default function Home() {
               firstName: firstName.trim() === '' ? 'Anonymous' : firstName,
               lastName: lastName,
               email: email,
-              phone: phone ? `${countryCode} ${phone}` : null
+              phone: phone ? `${countryCode} ${phone}` : undefined
             }
           ],
-          shelterID: donationType === 'shelter' && selectedShelter ? parseInt(selectedShelter) : null,
+          shelterID: donationType === 'shelter' && selectedShelter ? parseInt(selectedShelter) : undefined,
           value: customAmount || amount
         };
         
-        notifications.show({
-          title: 'Príspevok bol úspešne odoslaný!',
-          message: 'Ďakujeme za vašu podporu.',
-          color: 'green',
-          icon: '✅',
-          autoClose: 5000,
-        });
+        try {
+          await api.submitDonation(formData);
+          notifications.show({
+            title: 'Príspevok bol úspešne odoslaný!',
+            message: 'Ďakujeme za vašu podporu.',
+            color: 'green',
+            icon: '✅',
+            autoClose: 5000,
+          });
+        } catch (error) {
+          notifications.show({
+            title: 'Chyba pri odosielaní',
+            message: 'Príspevok sa nepodarilo odoslať. Skúste to znova.',
+            color: 'red',
+            icon: '❌',
+            autoClose: 5000,
+          });
+        }
       }
     }
   };

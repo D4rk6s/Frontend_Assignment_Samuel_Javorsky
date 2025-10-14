@@ -10,19 +10,21 @@ export default function OProjektePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const data = await api.getStats();
-        setStats(data);
-      } catch (err) {
-        setError('Nepodarilo sa načítať štatistiky');
-        console.error('Error fetching stats:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await api.getStats();
+      setStats(data);
+    } catch (err) {
+      setError('Nepodarilo sa načítať štatistiky');
+      console.error('Error fetching stats:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchStats();
   }, []);
   return (
