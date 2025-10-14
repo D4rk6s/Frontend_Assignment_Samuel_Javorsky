@@ -1,169 +1,147 @@
 'use client';
 
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useShelters } from '@/hooks/useApi';
 import { Select, NumberInput, TextInput, Checkbox } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { GoodBoyIcon } from '@/components/GoodBoyIcon';
 import { FacebookIcon, InstagramIcon } from '@/components/SocialIcons';
 import Footer from '@/components/Footer';
-import { donationFormSchema } from '@/lib/validation';
+import { donationFormSchema, DonationFormData } from '@/lib/validation';
 import { api } from '@/lib/api';
+import { useAppStore } from '@/store/appStore';
 import Link from 'next/link';
 
 export default function Home() {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [donationType, setDonationType] = useState<'general' | 'shelter'>('general');
-  const [selectedShelter, setSelectedShelter] = useState<string | null>(null);
-  const [amount, setAmount] = useState<number>(0);
-  const [customAmount, setCustomAmount] = useState<number | undefined>(undefined);
-  const [firstName, setFirstName] = useState<string>('');
-  const [lastName, setLastName] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [phone, setPhone] = useState<string>('');
-  const [countryCode, setCountryCode] = useState<string>('+421');
-  const [consent, setConsent] = useState<boolean>(false);
-  const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const { currentStep, setCurrentStep, nextStep, previousStep, setSubmitting, isSubmitting } = useAppStore();
+  
+  const form = useForm<DonationFormData>({
+    resolver: zodResolver(donationFormSchema),
+    defaultValues: {
+      donationType: 'general',
+      shelterId: undefined,
+      amount: 0,
+      customAmount: undefined,
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      countryCode: '+421',
+      gdprConsent: false,
+    },
+    mode: 'onChange',
+  });
+
+  const { watch, setValue, register, formState: { errors } } = form;
+  
+  const donationType = watch('donationType');
+  const selectedShelter = watch('shelterId');
+  const amount = watch('amount');
+  const customAmount = watch('customAmount');
+  const firstName = watch('firstName');
+  const lastName = watch('lastName');
+  const email = watch('email');
+  const phone = watch('phone');
+  const countryCode = watch('countryCode');
+  const consent = watch('gdprConsent');
 
   const { data: sheltersData } = useShelters();
   const shelters = sheltersData?.shelters || [];
 
   const predefinedAmounts = [5, 10, 20, 30, 50, 100];
 
-  const validateField = (fieldName: string, value: any) => {
-    const newErrors = { ...errors };
-    delete newErrors[fieldName];
-    
-    const fieldSchema = donationFormSchema.shape[fieldName as keyof typeof donationFormSchema.shape];
-    if (fieldSchema) {
-      const result = fieldSchema.safeParse(value);
-      if (!result.success) {
-        newErrors[fieldName] = result.error.issues[0].message;
-      }
-    }
-    
-    setErrors(newErrors);
-  };
-
-  const validateStep = (step: number) => {
-    const newErrors: {[key: string]: string} = {};
-    
+  const validateStep = async (step: number) => {
     if (step === 1) {
-      const currentAmount = customAmount || amount;
-      if (currentAmount === 0) {
-        newErrors.amount = 'Prosím vyberte sumu príspevku';
-      }
-      if (donationType === 'shelter' && !selectedShelter) {
-        newErrors.shelter = 'Prosím vyberte útulok';
-      }
+      const fieldsToValidate = ['amount', 'donationType', 'shelterId'];
+      const results = await Promise.all(
+        fieldsToValidate.map(field => form.trigger(field as keyof DonationFormData))
+      );
+      return results.every(result => result);
     }
     
     if (step === 2) {
-      const formData = {
-        donationType,
-        shelterId: selectedShelter ? parseInt(selectedShelter) : undefined,
-        amount: customAmount || amount,
-        customAmount,
-        firstName: firstName || '',
-        lastName,
-        email,
-        phone,
-        countryCode,
-        gdprConsent: true
-      };
-
-      try {
-        donationFormSchema.parse(formData);
-      } catch (error: any) {
-        if (error.issues) {
-          error.issues.forEach((err: any) => {
-            if (err.path[0] !== 'gdprConsent') {
-              newErrors[err.path[0]] = err.message;
-            }
-          });
-        }
-      }
+      const fieldsToValidate = ['firstName', 'lastName', 'email', 'phone', 'countryCode'];
+      const results = await Promise.all(
+        fieldsToValidate.map(field => form.trigger(field as keyof DonationFormData))
+      );
+      return results.every(result => result);
     }
     
     if (step === 3) {
-      if (!consent) {
-        newErrors.gdprConsent = 'Musíte súhlasiť so spracovaním osobných údajov';
-      }
+      return await form.trigger('gdprConsent');
     }
     
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return true;
+  };
+
+  const onSubmit = async (data: DonationFormData) => {
+    setSubmitting(true);
+    
+    const formData = {
+      contributors: [
+        {
+          firstName: data.firstName.trim() === '' ? 'Anonymous' : data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone ? `${data.countryCode} ${data.phone}` : undefined
+        }
+      ],
+      shelterID: data.donationType === 'shelter' && data.shelterId ? data.shelterId : undefined,
+      value: data.customAmount || data.amount
+    };
+    
+    try {
+      await api.submitDonation(formData);
+      notifications.show({
+        title: 'Príspevok bol úspešne odoslaný!',
+        message: 'Ďakujeme za vašu podporu.',
+        color: 'green',
+        icon: '✅',
+        autoClose: 5000,
+      });
+    } catch (error) {
+      notifications.show({
+        title: 'Chyba pri odosielaní',
+        message: 'Príspevok sa nepodarilo odoslať. Skúste to znova.',
+        color: 'red',
+        icon: '❌',
+        autoClose: 5000,
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleNext = async () => {
     if (currentStep === 1) {
-      if (validateStep(1)) {
-        setCurrentStep(2);
+      if (await validateStep(1)) {
+        nextStep();
       }
     } else if (currentStep === 2) {
-      if (validateStep(2)) {
-        setCurrentStep(3);
+      if (await validateStep(2)) {
+        nextStep();
       }
     } else if (currentStep === 3) {
-      if (validateStep(3)) {
-        const formData = {
-          contributors: [
-            {
-              firstName: firstName.trim() === '' ? 'Anonymous' : firstName,
-              lastName: lastName,
-              email: email,
-              phone: phone ? `${countryCode} ${phone}` : undefined
-            }
-          ],
-          shelterID: donationType === 'shelter' && selectedShelter ? parseInt(selectedShelter) : undefined,
-          value: customAmount || amount
-        };
-        
-        try {
-          await api.submitDonation(formData);
-          notifications.show({
-            title: 'Príspevok bol úspešne odoslaný!',
-            message: 'Ďakujeme za vašu podporu.',
-            color: 'green',
-            icon: '✅',
-            autoClose: 5000,
-          });
-        } catch (error) {
-          notifications.show({
-            title: 'Chyba pri odosielaní',
-            message: 'Príspevok sa nepodarilo odoslať. Skúste to znova.',
-            color: 'red',
-            icon: '❌',
-            autoClose: 5000,
-          });
-        }
+      if (await validateStep(3)) {
+        form.handleSubmit(onSubmit)();
       }
     }
   };
 
   const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
+    previousStep();
   };
 
   const handleAmountSelect = (selectedAmount: number) => {
-    setAmount(selectedAmount);
-    setCustomAmount(undefined);
-    const newErrors = { ...errors };
-    delete newErrors.amount;
-    setErrors(newErrors);
+    setValue('amount', selectedAmount, { shouldValidate: true });
+    setValue('customAmount', undefined, { shouldValidate: true });
   };
 
   const handleCustomAmountChange = (value: number | string) => {
     const numValue = typeof value === 'string' ? parseFloat(value) || 0 : value;
-    setCustomAmount(numValue);
-    setAmount(numValue);
-    if (numValue > 0) {
-      const newErrors = { ...errors };
-      delete newErrors.amount;
-      setErrors(newErrors);
-    }
+    setValue('customAmount', numValue, { shouldValidate: true });
+    setValue('amount', numValue, { shouldValidate: true });
   };
 
   return (
@@ -278,7 +256,7 @@ export default function Home() {
                           <div className="flex space-x-3">
                             <button
                               onClick={() => {
-                                setDonationType('shelter');
+                                setValue('donationType', 'shelter', { shouldValidate: true });
                               }}
                               className={`flex-1 py-4 px-6 rounded-xl border-2 transition-colors ${
                                 donationType === 'shelter'
@@ -299,11 +277,8 @@ export default function Home() {
                             </button>
                             <button
                               onClick={() => {
-                                setDonationType('general');
-                                setSelectedShelter(null);
-                                const newErrors = { ...errors };
-                                delete newErrors.shelter;
-                                setErrors(newErrors);
+                                setValue('donationType', 'general', { shouldValidate: true });
+                                setValue('shelterId', undefined, { shouldValidate: true });
                               }}
                               className={`flex-1 py-4 px-6 rounded-xl border-2 transition-colors ${
                                 donationType === 'general'
@@ -347,11 +322,11 @@ export default function Home() {
                           <Select
                             placeholder="Vyberte útulok zo zoznamu"
                             data={shelters.map(shelter => ({ value: shelter.id.toString(), label: shelter.name }))}
-                            value={selectedShelter}
-                            onChange={setSelectedShelter}
+                            value={selectedShelter?.toString()}
+                            onChange={(value) => setValue('shelterId', value ? parseInt(value) : undefined, { shouldValidate: true })}
                             className="w-full"
                             size="md"
-                            error={errors.shelter}
+                            error={errors.shelterId?.message}
                             styles={{
                               input: {
                                 backgroundColor: donationType === 'general' ? '#f3f4f6' : 'white',
@@ -412,7 +387,7 @@ export default function Home() {
                             ))}
                           </div>
                           {errors.amount && (
-                            <p className="text-red-500 text-sm mt-2">{errors.amount}</p>
+                            <p className="text-red-500 text-sm mt-2">{errors.amount.message}</p>
                           )}
                         </div>
                       )}
@@ -438,13 +413,9 @@ export default function Home() {
                                 }}>Meno</label>
                                 <TextInput
                                   placeholder="Zadajte Vaše meno"
-                                  value={firstName}
-                                  onChange={(e) => {
-                                    setFirstName(e.target.value);
-                                    validateField('firstName', e.target.value);
-                                  }}
+                                  {...register('firstName')}
                                   size="lg"
-                                  error={errors.firstName}
+                                  error={errors.firstName?.message}
                                   styles={{
                                     input: { backgroundColor: '#f3f4f6' }
                                   }}
@@ -460,13 +431,9 @@ export default function Home() {
                                 }}>Priezvisko</label>
                                 <TextInput
                                   placeholder="Zadajte Vaše priezvisko"
-                                  value={lastName}
-                                  onChange={(e) => {
-                                    setLastName(e.target.value);
-                                    validateField('lastName', e.target.value);
-                                  }}
+                                  {...register('lastName')}
                                   size="lg"
-                                  error={errors.lastName}
+                                  error={errors.lastName?.message}
                                   styles={{
                                     input: { backgroundColor: '#f3f4f6' }
                                   }}
@@ -485,13 +452,9 @@ export default function Home() {
                             }}>E-mailová adresa</label>
                             <TextInput
                               placeholder="Zadajte Váš e-mail"
-                              value={email}
-                              onChange={(e) => {
-                                setEmail(e.target.value);
-                                validateField('email', e.target.value);
-                              }}
+                              {...register('email')}
                               size="lg"
-                              error={errors.email}
+                              error={errors.email?.message}
                               styles={{
                                 input: { backgroundColor: '#f3f4f6' }
                               }}
@@ -539,7 +502,7 @@ export default function Home() {
                                   </div>
                                 )}
                                 value={countryCode}
-                                onChange={(value) => setCountryCode(value || '+421')}
+                                onChange={(value) => setValue('countryCode', (value as '+420' | '+421') || '+421', { shouldValidate: true })}
                                 size="lg"
                                 className="w-24"
                                 leftSection={
@@ -588,12 +551,11 @@ export default function Home() {
                                   const fullValue = e.target.value;
                                   const withoutCountryCode = fullValue.replace(countryCode, '').trim();
                                   const numbersOnly = withoutCountryCode.replace(/[^0-9\s]/g, '');
-                                  setPhone(numbersOnly);
-                                  validateField('phone', numbersOnly);
+                                  setValue('phone', numbersOnly, { shouldValidate: true });
                                 }}
                                 size="lg"
                                 className="flex-1"
-                                error={errors.phone}
+                                error={errors.phone?.message}
                                 styles={{
                                   input: { 
                                     borderTopLeftRadius: 0, 
@@ -657,12 +619,11 @@ export default function Home() {
                             <Checkbox
                               checked={consent}
                               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setConsent(event.currentTarget.checked);
-                                validateField('gdprConsent', event.currentTarget.checked);
+                                setValue('gdprConsent', event.currentTarget.checked, { shouldValidate: true });
                               }}
                               label="Súhlasím so spracovaním mojich osobných údajov"
                               size="md"
-                              error={errors.gdprConsent}
+                              error={errors.gdprConsent?.message}
                               styles={{
                                 label: {
                                   fontSize: '14px',
@@ -705,7 +666,8 @@ export default function Home() {
                         
                         <button
                           onClick={handleNext}
-                          className="flex items-center px-8 py-3 text-white rounded-lg hover:opacity-90"
+                          disabled={isSubmitting}
+                          className="flex items-center px-8 py-3 text-white rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                           style={{ 
                             backgroundColor: '#4F46E5',
                             fontFamily: 'Inter, sans-serif',
@@ -715,7 +677,7 @@ export default function Home() {
                             letterSpacing: '0px'
                           }}
                         >
-                          {currentStep === 3 ? 'Odoslať formulár' : 'Pokračovať →'}
+                          {isSubmitting ? 'Odosielam...' : (currentStep === 3 ? 'Odoslať formulár' : 'Pokračovať →')}
                         </button>
                       </div>
 
