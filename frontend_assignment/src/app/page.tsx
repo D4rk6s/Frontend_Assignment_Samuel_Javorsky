@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { useShelters } from '@/hooks/useApi';
-import { Select, NumberInput, TextInput } from '@mantine/core';
+import { Select, NumberInput, TextInput, Checkbox } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { GoodBoyIcon } from '@/components/GoodBoyIcon';
 import { FacebookIcon, InstagramIcon } from '@/components/SocialIcons';
+import { donationFormSchema } from '@/lib/validation';
 
 export default function Home() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -18,15 +20,110 @@ export default function Home() {
   const [phone, setPhone] = useState<string>('');
   const [countryCode, setCountryCode] = useState<string>('+421');
   const [consent, setConsent] = useState<boolean>(false);
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
 
   const { data: sheltersData } = useShelters();
   const shelters = sheltersData?.shelters || [];
 
   const predefinedAmounts = [5, 10, 20, 30, 50, 100];
 
+  const validateField = (fieldName: string, value: any) => {
+    const newErrors = { ...errors };
+    delete newErrors[fieldName];
+    
+    const fieldSchema = donationFormSchema.shape[fieldName as keyof typeof donationFormSchema.shape];
+    if (fieldSchema) {
+      const result = fieldSchema.safeParse(value);
+      if (!result.success) {
+        newErrors[fieldName] = result.error.issues[0].message;
+      }
+    }
+    
+    setErrors(newErrors);
+  };
+
+  const validateStep = (step: number) => {
+    const newErrors: {[key: string]: string} = {};
+    
+    if (step === 1) {
+      const currentAmount = customAmount || amount;
+      if (currentAmount === 0) {
+        newErrors.amount = 'Prosím vyberte sumu príspevku';
+      }
+      if (donationType === 'shelter' && !selectedShelter) {
+        newErrors.shelter = 'Prosím vyberte útulok';
+      }
+    }
+    
+    if (step === 2) {
+      const formData = {
+        donationType,
+        shelterId: selectedShelter ? parseInt(selectedShelter) : undefined,
+        amount: customAmount || amount,
+        customAmount,
+        firstName: firstName || '',
+        lastName,
+        email,
+        phone,
+        countryCode,
+        gdprConsent: true
+      };
+
+      try {
+        donationFormSchema.parse(formData);
+      } catch (error: any) {
+        if (error.issues) {
+          error.issues.forEach((err: any) => {
+            if (err.path[0] !== 'gdprConsent') {
+              newErrors[err.path[0]] = err.message;
+            }
+          });
+        }
+      }
+    }
+    
+    if (step === 3) {
+      if (!consent) {
+        newErrors.gdprConsent = 'Musíte súhlasiť so spracovaním osobných údajov';
+      }
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleNext = () => {
-    if (currentStep < 3) {
-      setCurrentStep(currentStep + 1);
+    if (currentStep === 1) {
+      if (validateStep(1)) {
+        setCurrentStep(2);
+      }
+    } else if (currentStep === 2) {
+      if (validateStep(2)) {
+        setCurrentStep(3);
+      }
+    } else if (currentStep === 3) {
+      if (validateStep(3)) {
+        const formData = {
+          contributors: [
+            {
+              firstName: firstName.trim() === '' ? 'Anonymous' : firstName,
+              lastName: lastName,
+              email: email,
+              phone: phone ? `${countryCode} ${phone}` : null
+            }
+          ],
+          shelterID: donationType === 'shelter' && selectedShelter ? parseInt(selectedShelter) : null,
+          value: customAmount || amount
+        };
+        
+        notifications.show({
+          title: 'Príspevok bol úspešne odoslaný!',
+          message: 'Ďakujeme za vašu podporu.',
+          color: 'green',
+          icon: '✅',
+          autoClose: 5000,
+        });
+      }
     }
   };
 
@@ -39,12 +136,20 @@ export default function Home() {
   const handleAmountSelect = (selectedAmount: number) => {
     setAmount(selectedAmount);
     setCustomAmount(undefined);
+    const newErrors = { ...errors };
+    delete newErrors.amount;
+    setErrors(newErrors);
   };
 
   const handleCustomAmountChange = (value: number | string) => {
     const numValue = typeof value === 'string' ? parseFloat(value) || 0 : value;
     setCustomAmount(numValue);
     setAmount(numValue);
+    if (numValue > 0) {
+      const newErrors = { ...errors };
+      delete newErrors.amount;
+      setErrors(newErrors);
+    }
   };
 
   return (
@@ -142,6 +247,18 @@ export default function Home() {
                             Potrebujeme od Vás zopár informácií
                           </h1>
                         )}
+
+                        {currentStep === 3 && (
+                          <h1 className="text-gray-900" style={{ 
+                            fontFamily: 'Inter, sans-serif',
+                            fontWeight: 700,
+                            fontSize: '48px',
+                            lineHeight: '56px',
+                            letterSpacing: '-0.3px'
+                          }}>
+                            Skontrolujte si zadané údaje
+                          </h1>
+                        )}
                       </div>
 
                       <div className="flex-1">
@@ -174,6 +291,9 @@ export default function Home() {
                               onClick={() => {
                                 setDonationType('general');
                                 setSelectedShelter(null);
+                                const newErrors = { ...errors };
+                                delete newErrors.shelter;
+                                setErrors(newErrors);
                               }}
                               className={`flex-1 py-4 px-6 rounded-xl border-2 transition-colors ${
                                 donationType === 'general'
@@ -221,6 +341,7 @@ export default function Home() {
                             onChange={setSelectedShelter}
                             className="w-full"
                             size="md"
+                            error={errors.shelter}
                             styles={{
                               input: {
                                 backgroundColor: donationType === 'general' ? '#f3f4f6' : 'white',
@@ -280,6 +401,9 @@ export default function Home() {
                               </button>
                             ))}
                           </div>
+                          {errors.amount && (
+                            <p className="text-red-500 text-sm mt-2">{errors.amount}</p>
+                          )}
                         </div>
                       )}
 
@@ -305,8 +429,12 @@ export default function Home() {
                                 <TextInput
                                   placeholder="Zadajte Vaše meno"
                                   value={firstName}
-                                  onChange={(e) => setFirstName(e.target.value)}
+                                  onChange={(e) => {
+                                    setFirstName(e.target.value);
+                                    validateField('firstName', e.target.value);
+                                  }}
                                   size="lg"
+                                  error={errors.firstName}
                                   styles={{
                                     input: { backgroundColor: '#f3f4f6' }
                                   }}
@@ -323,8 +451,12 @@ export default function Home() {
                                 <TextInput
                                   placeholder="Zadajte Vaše priezvisko"
                                   value={lastName}
-                                  onChange={(e) => setLastName(e.target.value)}
+                                  onChange={(e) => {
+                                    setLastName(e.target.value);
+                                    validateField('lastName', e.target.value);
+                                  }}
                                   size="lg"
+                                  error={errors.lastName}
                                   styles={{
                                     input: { backgroundColor: '#f3f4f6' }
                                   }}
@@ -344,8 +476,12 @@ export default function Home() {
                             <TextInput
                               placeholder="Zadajte Váš e-mail"
                               value={email}
-                              onChange={(e) => setEmail(e.target.value)}
+                              onChange={(e) => {
+                                setEmail(e.target.value);
+                                validateField('email', e.target.value);
+                              }}
                               size="lg"
+                              error={errors.email}
                               styles={{
                                 input: { backgroundColor: '#f3f4f6' }
                               }}
@@ -441,10 +577,13 @@ export default function Home() {
                                 onChange={(e) => {
                                   const fullValue = e.target.value;
                                   const withoutCountryCode = fullValue.replace(countryCode, '').trim();
-                                  setPhone(withoutCountryCode);
+                                  const numbersOnly = withoutCountryCode.replace(/[^0-9\s]/g, '');
+                                  setPhone(numbersOnly);
+                                  validateField('phone', numbersOnly);
                                 }}
                                 size="lg"
                                 className="flex-1"
+                                error={errors.phone}
                                 styles={{
                                   input: { 
                                     borderTopLeftRadius: 0, 
@@ -454,6 +593,85 @@ export default function Home() {
                                 }}
                               />
                             </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {currentStep === 3 && (
+                        <div className="space-y-8">
+                          <div className="space-y-6">
+                            <h3 className="text-lg font-semibold text-gray-900">Zhrnutie</h3>
+                            <div className="space-y-4">
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Forma pomoci</span>
+                                <span className="font-medium text-gray-900">
+                                  {donationType === 'general' 
+                                    ? 'Finančný príspevok celej nadácii' 
+                                    : 'Finančný príspevok konkrétnemu útulku'
+                                  }
+                                </span>
+                              </div>
+                              {donationType === 'shelter' && selectedShelter && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-600">Útulok</span>
+                                  <span className="font-medium text-gray-900">{selectedShelter}</span>
+                                </div>
+                              )}
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Suma príspevku</span>
+                                <span className="font-medium text-gray-900">
+                                  {customAmount ? `${customAmount} €` : `${amount} €`}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="border-t border-gray-200 pt-6">
+                            <div className="space-y-4">
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Meno a priezvisko</span>
+                                <span className="font-medium text-gray-900">{firstName} {lastName}</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">E-mail</span>
+                                <span className="font-medium text-gray-900">{email}</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Telefónne číslo</span>
+                                <span className="font-medium text-gray-900">{countryCode} {phone}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="border-t border-gray-200 pt-4">
+                            <Checkbox
+                              checked={consent}
+                              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setConsent(event.currentTarget.checked);
+                                validateField('gdprConsent', event.currentTarget.checked);
+                              }}
+                              label="Súhlasím so spracovaním mojich osobných údajov"
+                              size="md"
+                              error={errors.gdprConsent}
+                              styles={{
+                                label: {
+                                  fontSize: '14px',
+                                  lineHeight: '20px',
+                                  color: '#374151'
+                                },
+                                input: {
+                                  backgroundColor: consent ? '#f3f4f6' : 'white',
+                                  borderColor: '#4F46E5',
+                                  '&:checked': {
+                                    backgroundColor: '#f3f4f6',
+                                    borderColor: '#4F46E5'
+                                  }
+                                },
+                                icon: {
+                                  color: '#4F46E5'
+                                }
+                              }}
+                            />
                           </div>
                         </div>
                       )}
@@ -487,7 +705,7 @@ export default function Home() {
                             letterSpacing: '0px'
                           }}
                         >
-                          Pokračovať →
+                          {currentStep === 3 ? 'Odoslať formulár' : 'Pokračovať →'}
                         </button>
                       </div>
 
