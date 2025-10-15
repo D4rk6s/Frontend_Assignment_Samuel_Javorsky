@@ -1,9 +1,11 @@
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import { GoodBoyIcon } from './GoodBoyIcon';
 import { FacebookIcon, InstagramIcon } from './SocialIcons';
 import { useAppStore } from '@/store/appStore';
 
 export default function Footer() {
+  const { t } = useTranslation();
   const { theme } = useAppStore();
   return (
     <div className="pt-1">
@@ -24,8 +26,8 @@ export default function Footer() {
                 </div>
               </div>
               <div className="flex space-x-6">
-                <Link href="/kontakt" className={`transition-colors ${theme === 'dark' ? 'hover:text-white' : 'hover:text-gray-700'}`}>Kontakt</Link>
-                <Link href="/o-projekte" className={`transition-colors ${theme === 'dark' ? 'hover:text-white' : 'hover:text-gray-700'}`}>O projekte</Link>
+                <Link href="/kontakt" className={`transition-colors ${theme === 'dark' ? 'hover:text-white' : 'hover:text-gray-700'}`}>{t('footer.contact')}</Link>
+                <Link href="/o-projekte" className={`transition-colors ${theme === 'dark' ? 'hover:text-white' : 'hover:text-gray-700'}`}>{t('footer.about')}</Link>
               </div>
             </div>
           </div>

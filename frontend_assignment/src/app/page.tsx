@@ -2,19 +2,29 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
+import { useEffect, useState } from 'react';
 import { useShelters } from '@/hooks/useApi';
-import { Select, NumberInput, TextInput, Checkbox } from '@mantine/core';
+import { Select, TextInput, Checkbox } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { GoodBoyIcon } from '@/components/GoodBoyIcon';
-import { FacebookIcon, InstagramIcon } from '@/components/SocialIcons';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import Footer from '@/components/Footer';
 import { donationFormSchema, DonationFormData } from '@/lib/validation';
 import { api } from '@/lib/api';
 import { useAppStore } from '@/store/appStore';
-import Link from 'next/link';
 
 export default function Home() {
-  const { currentStep, setCurrentStep, nextStep, previousStep, setSubmitting, isSubmitting, theme, toggleTheme } = useAppStore();
+  const { t, i18n } = useTranslation();
+  const { currentStep, nextStep, previousStep, setSubmitting, isSubmitting, theme, toggleTheme } = useAppStore();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    const storedLanguage = localStorage.getItem('i18nextLng');
+    if (storedLanguage && storedLanguage !== i18n.language) {
+      i18n.changeLanguage(storedLanguage);
+    }
+  }, []);
   
   const form = useForm<DonationFormData>({
     resolver: zodResolver(donationFormSchema),
@@ -94,16 +104,16 @@ export default function Home() {
     try {
       await api.submitDonation(formData);
       notifications.show({
-        title: 'Príspevok bol úspešne odoslaný!',
-        message: 'Ďakujeme za vašu podporu.',
+        title: t('form.notifications.success.title'),
+        message: t('form.notifications.success.message'),
         color: 'green',
         icon: '✅',
         autoClose: 5000,
       });
-    } catch (error) {
+    } catch {
       notifications.show({
-        title: 'Chyba pri odosielaní',
-        message: 'Príspevok sa nepodarilo odoslať. Skúste to znova.',
+        title: t('form.notifications.error.title'),
+        message: t('form.notifications.error.message'),
         color: 'red',
         icon: '❌',
         autoClose: 5000,
@@ -150,11 +160,13 @@ export default function Home() {
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 h-[95vh]">
                   
                   <div className="lg:col-span-3 flex flex-col h-[95vh] relative">
-                    <button
-                      onClick={toggleTheme}
-                      className="absolute top-4 right-4 p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200 z-10"
-                      title={theme === 'light' ? 'Prepnúť na tmavý režim' : 'Prepnúť na svetlý režim'}
-                    >
+                    <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+                      <LanguageSwitcher />
+                      <button
+                        onClick={toggleTheme}
+                        className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200"
+                        title={theme === 'light' ? t('theme.toggleDark') : t('theme.toggleLight')}
+                      >
                       {theme === 'light' ? (
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-gray-700 dark:text-gray-300">
                           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -165,7 +177,8 @@ export default function Home() {
                           <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                         </svg>
                       )}
-                    </button>
+                      </button>
+                    </div>
                     <div className="p-12 h-full flex flex-col">
               
 
@@ -173,10 +186,10 @@ export default function Home() {
                 <div className="flex items-center w-full">
                   <div className="flex items-center">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      currentStep > 1 ? 'border-2 border-[#4F46E5] bg-white' : currentStep === 1 ? 'bg-[#4F46E5]' : 'bg-gray-300'
+                      currentStep > 1 ? 'border-2 border-[#4F46E5] bg-white' : currentStep === 1 ? 'bg-[#4F46E5]' : 'bg-white border-2 border-[#D1D5DB]'
                     }`}>
                       <span className={`text-sm font-bold ${
-                        currentStep > 1 ? 'text-[#4F46E5]' : currentStep === 1 ? 'text-white' : 'text-gray-500'
+                        currentStep > 1 ? 'text-[#4F46E5]' : currentStep === 1 ? 'text-white' : 'text-[#D1D5DB]'
                       }`}>
                         {currentStep > 1 ? (
                           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -186,18 +199,18 @@ export default function Home() {
                       </span>
                     </div>
                     <span className={`ml-3 text-sm font-semibold transition-colors duration-300 ${
-                      currentStep >= 1 ? (theme === 'dark' ? 'text-white' : 'text-gray-900') : 'text-gray-400'
-                    }`}>Výber útulku</span>
+                      currentStep >= 1 ? (theme === 'dark' ? 'text-white' : 'text-gray-900') : 'text-[#D1D5DB]'
+                    }`}>{isMounted ? t('form.step1.shelterLabel') : 'Výber útulku'}</span>
                   </div>
                   
                   <div className="flex-1 h-px mx-4 bg-[#D1D5DB]"></div>
                   
                   <div className="flex items-center">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      currentStep > 2 ? 'border-2 border-[#4F46E5] bg-white' : currentStep === 2 ? 'bg-[#4F46E5]' : 'bg-gray-300'
+                      currentStep > 2 ? 'border-2 border-[#4F46E5] bg-white' : currentStep === 2 ? 'bg-[#4F46E5]' : 'bg-white border-2 border-[#D1D5DB]'
                     }`}>
                       <span className={`text-sm font-bold ${
-                        currentStep > 2 ? 'text-[#4F46E5]' : currentStep === 2 ? 'text-white' : 'text-gray-500'
+                        currentStep > 2 ? 'text-[#4F46E5]' : currentStep === 2 ? 'text-white' : 'text-[#D1D5DB]'
                       }`}>
                         {currentStep > 2 ? (
                           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -207,23 +220,23 @@ export default function Home() {
                       </span>
                     </div>
                     <span className={`ml-3 text-sm font-semibold transition-colors duration-300 ${
-                      currentStep >= 2 ? (theme === 'dark' ? 'text-white' : 'text-gray-900') : 'text-gray-400'
-                    }`}>Osobné údaje</span>
+                      currentStep >= 2 ? (theme === 'dark' ? 'text-white' : 'text-gray-900') : 'text-[#D1D5DB]'
+                    }`}>{isMounted ? t('form.step2.aboutYou') : 'Osobné údaje'}</span>
                   </div>
                   
                   <div className="flex-1 h-px mx-4 bg-[#D1D5DB]"></div>
                   
                   <div className="flex items-center">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      currentStep === 3 ? 'bg-[#4F46E5]' : 'bg-gray-300'
+                      currentStep === 3 ? 'bg-[#4F46E5]' : 'bg-white border-2 border-[#D1D5DB]'
                     }`}>
                       <span className={`text-sm font-bold ${
-                        currentStep === 3 ? 'text-white' : 'text-gray-500'
+                        currentStep === 3 ? 'text-white' : 'text-[#D1D5DB]'
                       }`}>3</span>
                     </div>
                     <span className={`ml-3 text-sm font-semibold transition-colors duration-300 ${
-                      currentStep >= 3 ? (theme === 'dark' ? 'text-white' : 'text-gray-900') : 'text-gray-400'
-                    }`}>Potvrdenie</span>
+                      currentStep >= 3 ? (theme === 'dark' ? 'text-white' : 'text-gray-900') : 'text-[#D1D5DB]'
+                    }`}>{isMounted ? t('form.step3.title') : 'Potvrdenie'}</span>
                   </div>
                 </div>
               </div>
@@ -237,7 +250,7 @@ export default function Home() {
                             lineHeight: '56px',
                             letterSpacing: '-0.3px'
                           }}>
-                            Vyberte si možnosť, ako chcete pomôcť
+                            {t('form.step1.title')}
                           </h1>
                         )}
 
@@ -249,7 +262,7 @@ export default function Home() {
                             lineHeight: '56px',
                             letterSpacing: '-0.3px'
                           }}>
-                            Potrebujeme od Vás zopár informácií
+                            {t('form.step2.title')}
                           </h1>
                         )}
 
@@ -261,7 +274,7 @@ export default function Home() {
                             lineHeight: '56px',
                             letterSpacing: '-0.3px'
                           }}>
-                            Skontrolujte si zadané údaje
+                            {t('form.step3.title')}
                           </h1>
                         )}
                       </div>
@@ -292,7 +305,7 @@ export default function Home() {
                                 textAlign: 'center'
                               }}
                             >
-                              Prispieť konkrétnemu útulku
+                              {t('form.step1.donateSpecific')}
                             </button>
                             <button
                               onClick={() => {
@@ -316,7 +329,7 @@ export default function Home() {
                                 textAlign: 'center'
                               }}
                             >
-                              Prispieť celej nadácii
+                              {t('form.step1.donateGeneral')}
                             </button>
                           </div>
                         </div>
@@ -330,7 +343,7 @@ export default function Home() {
                             fontSize: '16px',
                             lineHeight: '24px',
                             letterSpacing: '0px'
-                          }}>O projekte</h3>
+                          }}>{t('form.step1.shelterLabel')}</h3>
                           <label className={`transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-1 block`} style={{
                             fontFamily: 'Inter, sans-serif',
                             fontWeight: 500,
@@ -338,10 +351,10 @@ export default function Home() {
                             lineHeight: '20px',
                             letterSpacing: '0px',
                           }}>
-                            Útulok {donationType === 'general' && <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} font-normal`}>(Nepovinné)</span>}
+                            {t('form.step1.shelterLabel')} {donationType === 'general' && <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} font-normal`}>{t('form.step1.shelterOptional')}</span>}
                           </label>
                           <Select
-                            placeholder="Vyberte útulok zo zoznamu"
+                            placeholder={t('form.step1.shelterPlaceholder')}
                             data={shelters.map(shelter => ({ value: shelter.id.toString(), label: shelter.name }))}
                             value={selectedShelter?.toString()}
                             onChange={(value) => setValue('shelterId', value ? parseInt(value) : undefined, { shouldValidate: true })}
@@ -372,7 +385,7 @@ export default function Home() {
                             lineHeight: '24px',
                             letterSpacing: '0px'
                           }}>
-                            Suma, ktorou chcem prispieť
+                            {t('form.step1.amountLabel')}
                           </h3>
                           
                           <div className="mb-6">
@@ -383,7 +396,7 @@ export default function Home() {
                                   value={customAmount || amount}
                                   onChange={(e) => handleCustomAmountChange(e.target.value)}
                                   className={`bg-transparent border-none outline-none text-4xl font-bold w-28 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors duration-300 ${(customAmount || amount) === 0 ? (theme === 'dark' ? 'text-gray-500' : 'text-gray-400') : (theme === 'dark' ? 'text-white' : 'text-gray-900')}`}
-                                  placeholder="0"
+                                  placeholder={t('form.step1.amountPlaceholder')}
                                   min="1"
                                 />
                                 <span className={`ml-2 text-2xl transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>€</span>
@@ -424,7 +437,7 @@ export default function Home() {
                               fontSize: '16px',
                               lineHeight: '24px',
                               letterSpacing: '0px'
-                            }}>O vás</h3>
+                            }}>{t('form.step2.aboutYou')}</h3>
                             <div className="grid grid-cols-2 gap-4">
                               <div>
                                 <label className={`transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-1 block`} style={{
@@ -433,9 +446,9 @@ export default function Home() {
                                   fontSize: '14px',
                                   lineHeight: '20px',
                                   letterSpacing: '0px',
-                                }}>Meno</label>
+                                }}>{t('form.step2.firstName')}</label>
                                 <TextInput
-                                  placeholder="Zadajte Vaše meno"
+                                  placeholder={t('form.step2.firstNamePlaceholder')}
                                   {...register('firstName')}
                                   size="lg"
                                   error={errors.firstName?.message}
@@ -451,9 +464,9 @@ export default function Home() {
                                   fontSize: '14px',
                                   lineHeight: '20px',
                                   letterSpacing: '0px',
-                                }}>Priezvisko</label>
+                                }}>{t('form.step2.lastName')}</label>
                                 <TextInput
-                                  placeholder="Zadajte Vaše priezvisko"
+                                  placeholder={t('form.step2.lastNamePlaceholder')}
                                   {...register('lastName')}
                                   size="lg"
                                   error={errors.lastName?.message}
@@ -472,9 +485,9 @@ export default function Home() {
                               fontSize: '14px',
                               lineHeight: '20px',
                               letterSpacing: '0px',
-                            }}>E-mailová adresa</label>
+                            }}>{t('form.step2.email')}</label>
                             <TextInput
-                              placeholder="Zadajte Váš e-mail"
+                              placeholder={t('form.step2.emailPlaceholder')}
                               {...register('email')}
                               size="lg"
                               error={errors.email?.message}
@@ -491,7 +504,7 @@ export default function Home() {
                               fontSize: '14px',
                               lineHeight: '20px',
                               letterSpacing: '0px',
-                            }}>Telefónne číslo</label>
+                            }}>{t('form.step2.phone')}</label>
                             <div className="flex">
                               <Select
                                 data={[
@@ -568,14 +581,22 @@ export default function Home() {
                                 }}
                               />
                               <TextInput
-                                placeholder="123 321 123"
-                                value={`${countryCode} ${phone}`}
+                                placeholder={t('form.step2.phonePlaceholder')}
+                                value={phone}
                                 onChange={(e) => {
-                                  const fullValue = e.target.value;
-                                  const withoutCountryCode = fullValue.replace(countryCode, '').trim();
-                                  const numbersOnly = withoutCountryCode.replace(/[^0-9\s]/g, '');
-                                  setValue('phone', numbersOnly, { shouldValidate: true });
+                                  const numbersOnly = e.target.value.replace(/[^0-9]/g, '');
+                                  
+                                  let formatted = numbersOnly;
+                                  if (numbersOnly.length > 3) {
+                                    formatted = numbersOnly.slice(0, 3) + ' ' + numbersOnly.slice(3);
+                                  }
+                                  if (numbersOnly.length > 6) {
+                                    formatted = numbersOnly.slice(0, 3) + ' ' + numbersOnly.slice(3, 6) + ' ' + numbersOnly.slice(6, 9);
+                                  }
+                                  
+                                  setValue('phone', formatted, { shouldValidate: true });
                                 }}
+                                leftSection={<span style={{ color: "black", fontWeight: "normal", fontSize: "16px", fontFamily: "inherit" }}>{countryCode}</span>}
                                 size="lg"
                                 className="flex-1"
                                 error={errors.phone?.message}
@@ -583,7 +604,10 @@ export default function Home() {
                                   input: { 
                                     borderTopLeftRadius: 0, 
                                     borderBottomLeftRadius: 0,
-                                    backgroundColor: '#f3f4f6'
+                                    borderLeft: 0,
+                                    backgroundColor: '#f6f7f9',
+                                    color: '#1a1a1a',
+                                    '::placeholder': { color: '#9ca3af' }
                                   }
                                 }}
                               />
@@ -595,25 +619,25 @@ export default function Home() {
                       {currentStep === 3 && (
                         <div className="space-y-8">
                           <div className="space-y-6">
-                            <h3 className={`text-lg font-semibold transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Zhrnutie</h3>
+                            <h3 className={`text-lg font-semibold transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{t('form.step3.summary')}</h3>
                             <div className="space-y-4">
                               <div className="flex justify-between items-center">
-                                <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Forma pomoci</span>
+                                <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('form.step3.helpForm')}</span>
                                 <span className={`font-medium transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                   {donationType === 'general' 
-                                    ? 'Finančný príspevok celej nadácii' 
-                                    : 'Finančný príspevok konkrétnemu útulku'
+                                    ? t('form.donationTypes.general')
+                                    : t('form.donationTypes.shelter')
                                   }
                                 </span>
                               </div>
                               {donationType === 'shelter' && selectedShelter && (
                                 <div className="flex justify-between items-center">
-                                  <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Útulok</span>
+                                  <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('form.step3.shelter')}</span>
                                   <span className={`font-medium transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{selectedShelter}</span>
                                 </div>
                               )}
                               <div className="flex justify-between items-center">
-                                <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Suma príspevku</span>
+                                <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('form.step3.amount')}</span>
                                 <span className={`font-medium transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                   {customAmount ? `${customAmount} €` : `${amount} €`}
                                 </span>
@@ -624,15 +648,15 @@ export default function Home() {
                           <div className={`border-t pt-6 transition-colors duration-300 ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
                             <div className="space-y-4">
                               <div className="flex justify-between items-center">
-                                <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Meno a priezvisko</span>
+                                <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('form.step3.nameSurname')}</span>
                                 <span className={`font-medium transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{firstName} {lastName}</span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>E-mail</span>
+                                <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('form.step3.email')}</span>
                                 <span className={`font-medium transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{email}</span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Telefónne číslo</span>
+                                <span className={`transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{t('form.step3.phone')}</span>
                                 <span className={`font-medium transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{countryCode} {phone}</span>
                               </div>
                             </div>
@@ -644,7 +668,7 @@ export default function Home() {
                               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                 setValue('gdprConsent', event.currentTarget.checked, { shouldValidate: true });
                               }}
-                              label="Súhlasím so spracovaním mojich osobných údajov"
+                              label={t('form.step3.gdprConsent')}
                               size="md"
                               error={errors.gdprConsent?.message}
                               styles={{
@@ -688,7 +712,7 @@ export default function Home() {
                             letterSpacing: '0px'
                           }}
                         >
-                          ← Späť
+                          ← {t('form.navigation.back')}
                         </button>
                         
                         <button
@@ -704,7 +728,7 @@ export default function Home() {
                             letterSpacing: '0px'
                           }}
                         >
-                          {isSubmitting ? 'Odosielam...' : (currentStep === 3 ? 'Odoslať formulár' : 'Pokračovať →')}
+                          {isSubmitting ? t('form.navigation.submitting') : (currentStep === 3 ? t('form.navigation.submit') : t('form.navigation.continue'))}
                         </button>
                       </div>
 

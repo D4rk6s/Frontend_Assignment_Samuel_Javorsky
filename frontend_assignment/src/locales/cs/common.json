@@ -1,0 +1,106 @@
+{
+  "form": {
+    "step1": {
+      "title": "Vyberte si možnost, jak chcete pomoci",
+      "donateSpecific": "Přispět konkrétnímu útulku",
+      "donateGeneral": "Přispět celé nadaci",
+      "shelterLabel": "Výběr útulku",
+      "shelterOptional": "(Nepovinné)",
+      "shelterPlaceholder": "Vyberte útulek ze seznamu",
+      "amountLabel": "Částka, kterou chci přispět",
+      "amountPlaceholder": "0"
+    },
+    "step2": {
+      "title": "Potřebujeme od vás několik informací",
+      "aboutYou": "Osobní údaje",
+      "firstName": "Jméno",
+      "firstNamePlaceholder": "Zadejte vaše jméno",
+      "lastName": "Příjmení",
+      "lastNamePlaceholder": "Zadejte vaše příjmení",
+      "email": "E-mailová adresa",
+      "emailPlaceholder": "Zadejte váš e-mail",
+      "phone": "Telefonní číslo",
+      "phonePlaceholder": "123 123 123"
+    },
+    "step3": {
+      "title": "Potvrzení",
+      "summary": "Shrnutí",
+      "helpForm": "Forma pomoci",
+      "shelter": "Útulek",
+      "amount": "Částka příspěvku",
+      "nameSurname": "Jméno a příjmení",
+      "email": "E-mail",
+      "phone": "Telefonní číslo",
+      "gdprConsent": "Souhlasím se zpracováním mých osobních údajů"
+    },
+    "navigation": {
+      "back": "Zpět",
+      "continue": "Pokračovat →",
+      "submit": "Odeslat formulář",
+      "submitting": "Odesílám..."
+    },
+    "donationTypes": {
+      "general": "Finanční příspěvek celé nadaci",
+      "shelter": "Finanční příspěvek konkrétnímu útulku"
+    },
+    "notifications": {
+      "success": {
+        "title": "Příspěvek byl úspěšně odeslán!",
+        "message": "Děkujeme za vaši podporu."
+      },
+      "error": {
+        "title": "Chyba při odesílání",
+        "message": "Příspěvek se nepodařilo odeslat. Zkuste to znovu."
+      }
+    }
+  },
+  "pages": {
+    "contact": {
+      "title": "Kontakt",
+      "email": {
+        "title": "Email",
+        "description": "Our friendly team is here to help.",
+        "address": "hello@goodrequest.com"
+      },
+      "office": {
+        "title": "Kancelář",
+        "description": "Přijďte nás pozdravit do naší kanceláře.",
+        "address": "Obchodná 3D, 010 08 Žilina, Slovakia"
+      },
+      "phone": {
+        "title": "Telefon",
+        "description": "Po-Pá od 8:00 do 17:00.",
+        "number": "+421 911 750 750"
+      }
+    },
+    "about": {
+      "title": "O projektu",
+      "description": "Nadace Good Boy se věnuje zlepšování života psů v Žilině na Slovensku. Zachraňujeme opuštěné, týrané a bezdomovské psy, poskytujeme jim lékařskou péči, útočiště a lásku, kterou si zaslouží. Naším posláním je dát těmto věrným společníkům druhou šanci na život tím, že jim najdeme milující domov. Kromě záchrany a rehabilitace se zaměřujeme také na podporu zodpovědného vlastnictví zvířat a ochranu zvířat prostřednictvím vzdělávacích a komunitních programů.",
+      "stats": {
+        "totalRaised": "Celková vybraná částka",
+        "donorCount": "Počet dárců"
+      },
+      "additionalInfo": "Naše práce je možná díky podpoře vášnivých dobrovolníků, štědrých dárců a komunity, která se hluboce stará o dobro zvířat. Organizujeme také kastrační a sterilizační iniciativy, abychom řešili problém toulavých psů a zajistili dlouhodobý dopad. V nadaci Good Boy věříme, že každý pes si zaslouží bezpečný, milující domov a šťastný život. Přidejte se k nám a pomozte nám dělat změny – ať už dobrovolnictvím, darováním nebo adopcí chlupatého přítele. Společně můžeme vytvořit lepší budoucnost pro psy v Žilině."
+    }
+  },
+  "footer": {
+    "contact": "Kontakt",
+    "about": "O projektu"
+  },
+  "theme": {
+    "toggleLight": "Přepnout na světlý režim",
+    "toggleDark": "Přepnout na tmavý režim"
+  },
+  "validation": {
+    "amountRequired": "Prosím vyberte částku příspěvku",
+    "shelterRequired": "Prosím vyberte útulek",
+    "firstNameMin": "Jméno musí mít alespoň 2 znaky",
+    "firstNameMax": "Jméno může mít nejvýše 20 znaků",
+    "lastNameMin": "Příjmení musí mít alespoň 2 znaky",
+    "lastNameMax": "Příjmení může mít nejvýše 30 znaků",
+    "emailInvalid": "Neplatná e-mailová adresa",
+    "phoneRequired": "Telefonní číslo je povinné",
+            "phoneFormat": "Telefonní číslo musí mít formát 123 123 123 (9 číslic)",
+    "gdprRequired": "Musíte souhlasit se zpracováním osobních údajů"
+  }
+}

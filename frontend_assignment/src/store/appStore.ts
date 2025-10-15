@@ -6,7 +6,7 @@ interface AppState {
   isLoading: boolean;
   isSubmitting: boolean;
   theme: 'light' | 'dark';
-  language: 'sk' | 'en';
+  language: 'sk' | 'cs' | 'en';
   
   setCurrentStep: (step: number) => void;
   nextStep: () => void;
@@ -15,7 +15,7 @@ interface AppState {
   setSubmitting: (submitting: boolean) => void;
   setTheme: (theme: 'light' | 'dark') => void;
   toggleTheme: () => void;
-  setLanguage: (language: 'sk' | 'en') => void;
+  setLanguage: (language: 'sk' | 'cs' | 'en') => void;
   reset: () => void;
 }
 
@@ -55,7 +55,7 @@ export const useAppStore = create<AppState>()(
         set({ theme: theme === 'light' ? 'dark' : 'light' });
       },
       
-      setLanguage: (language: 'sk' | 'en') => set({ language }),
+      setLanguage: (language: 'sk' | 'cs' | 'en') => set({ language }),
       
       reset: () => set({
         currentStep: 1,

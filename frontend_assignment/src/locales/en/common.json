@@ -1,0 +1,106 @@
+{
+  "form": {
+    "step1": {
+      "title": "Choose how you want to help",
+      "donateSpecific": "Donate to specific shelter",
+      "donateGeneral": "Donate to the foundation",
+      "shelterLabel": "Shelter Selection",
+      "shelterOptional": "(Optional)",
+      "shelterPlaceholder": "Select shelter from the list",
+      "amountLabel": "Amount I want to donate",
+      "amountPlaceholder": "0"
+    },
+    "step2": {
+      "title": "We need some information from you",
+      "aboutYou": "Personal Details",
+      "firstName": "First Name",
+      "firstNamePlaceholder": "Enter your first name",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Enter your last name",
+      "email": "Email address",
+      "emailPlaceholder": "Enter your email",
+      "phone": "Phone number",
+      "phonePlaceholder": "123 123 123"
+    },
+    "step3": {
+      "title": "Confirmation",
+      "summary": "Summary",
+      "helpForm": "Form of help",
+      "shelter": "Shelter",
+      "amount": "Donation amount",
+      "nameSurname": "Name and surname",
+      "email": "Email",
+      "phone": "Phone number",
+      "gdprConsent": "I agree to the processing of my personal data"
+    },
+    "navigation": {
+      "back": "Back",
+      "continue": "Continue →",
+      "submit": "Submit form",
+      "submitting": "Submitting..."
+    },
+    "donationTypes": {
+      "general": "Financial contribution to the foundation",
+      "shelter": "Financial contribution to specific shelter"
+    },
+    "notifications": {
+      "success": {
+        "title": "Donation submitted successfully!",
+        "message": "Thank you for your support."
+      },
+      "error": {
+        "title": "Submission error",
+        "message": "Failed to submit donation. Please try again."
+      }
+    }
+  },
+  "pages": {
+    "contact": {
+      "title": "Contact",
+      "email": {
+        "title": "Email",
+        "description": "Our friendly team is here to help.",
+        "address": "hello@goodrequest.com"
+      },
+      "office": {
+        "title": "Office",
+        "description": "Come say hello at our office HQ.",
+        "address": "Obchodná 3D, 010 08 Žilina, Slovakia"
+      },
+      "phone": {
+        "title": "Phone",
+        "description": "Mon-Fri from 8am to 5pm.",
+        "number": "+421 911 750 750"
+      }
+    },
+    "about": {
+      "title": "About the project",
+      "description": "The Good Boy Foundation is dedicated to improving the lives of dogs in Žilina, Slovakia. We rescue abandoned, abused, and homeless dogs, providing them with medical care, shelter, and the love they deserve. Our mission is to give these loyal companions a second chance at life by finding them loving homes. In addition to rescue and rehabilitation, we also focus on promoting responsible pet ownership and animal protection through educational and community programs.",
+      "stats": {
+        "totalRaised": "Total amount raised",
+        "donorCount": "Number of donors"
+      },
+      "additionalInfo": "Our work is made possible through the support of passionate volunteers, generous donors, and a community that deeply cares about animal welfare. We also organize spaying and neutering initiatives to address the stray dog problem and ensure long-term impact. At the Good Boy Foundation, we believe that every dog deserves a safe, loving home and a happy life. Join us and help us make a difference – whether through volunteering, donating, or adopting a furry friend. Together, we can create a better future for dogs in Žilina."
+    }
+  },
+  "footer": {
+    "contact": "Contact",
+    "about": "About"
+  },
+  "theme": {
+    "toggleLight": "Switch to light mode",
+    "toggleDark": "Switch to dark mode"
+  },
+  "validation": {
+    "amountRequired": "Please select donation amount",
+    "shelterRequired": "Please select a shelter",
+    "firstNameMin": "First name must be at least 2 characters",
+    "firstNameMax": "First name can have at most 20 characters",
+    "lastNameMin": "Last name must be at least 2 characters",
+    "lastNameMax": "Last name can have at most 30 characters",
+    "emailInvalid": "Invalid email address",
+    "phoneRequired": "Phone number is required",
+            "phoneFormat": "Phone number must be in format 123 123 123 (9 digits)",
+    "gdprRequired": "You must agree to the processing of personal data"
+  }
+}

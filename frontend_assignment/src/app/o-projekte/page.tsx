@@ -1,13 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { api, DonationStats } from '@/lib/api';
 import { useAppStore } from '@/store/appStore';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 export default function OProjektePage() {
+  const { t, i18n } = useTranslation();
   const { theme, toggleTheme } = useAppStore();
+  const [isMounted, setIsMounted] = useState(false);
   const [stats, setStats] = useState<DonationStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +31,11 @@ export default function OProjektePage() {
   };
 
   useEffect(() => {
+    setIsMounted(true);
+    const storedLanguage = localStorage.getItem('i18nextLng');
+    if (storedLanguage && storedLanguage !== i18n.language) {
+      i18n.changeLanguage(storedLanguage);
+    }
     fetchStats();
   }, []);
   return (
@@ -41,14 +50,16 @@ export default function OProjektePage() {
               <svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-2">
                 <path d="M14.6668 6H1.3335M1.3335 6L6.3335 11M1.3335 6L6.3335 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              Späť
+                     {isMounted ? t('form.navigation.back') : 'Späť'}
             </Link>
             
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200"
-              title={theme === 'light' ? 'Prepnúť na tmavý režim' : 'Prepnúť na svetlý režim'}
-            >
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200"
+                title={theme === 'light' ? t('theme.toggleDark') : t('theme.toggleLight')}
+              >
               {theme === 'light' ? (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-gray-700 dark:text-gray-300">
                   <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -59,24 +70,19 @@ export default function OProjektePage() {
                   <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                 </svg>
               )}
-            </button>
+              </button>
+            </div>
           </div>
           
           <h1 className={`text-5xl font-bold mb-12 transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            O projekte
+            {isMounted ? t('pages.about.title') : 'O projekte'}
           </h1>
         </div>
 
         <div className="max-w-6xl">
           <div className="mb-8">
             <p className={`text-lg leading-relaxed mb-6 text-left transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Nadácia Good Boy sa venuje zlepšovaniu života psov v Žiline na Slovensku. 
-              Zachraňujeme opustené, týrané a bezdomovské psy, poskytujeme im lekársku 
-              starostlivosť, útočisko a lásku, ktorú si zaslúžia. Naším poslaním je dať 
-              týmto verným spoločníkom druhú šancu na život tým, že im nájdeme milujúci domov. 
-              Okrem záchrany a rehabilitácie sa zameriavame aj na podporu zodpovedného 
-              vlastníctva zvierat a ochrany zvierat prostredníctvom vzdelávacích a 
-              komunitných programov.
+              {t('pages.about.description')}
             </p>
           </div>
 
@@ -93,7 +99,7 @@ export default function OProjektePage() {
                   )}
                 </div>
                 <p className={`text-lg transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                  Celková vyzbieraná hodnota
+                  {t('pages.about.stats.totalRaised')}
                 </p>
               </div>
               
@@ -108,7 +114,7 @@ export default function OProjektePage() {
                   )}
                 </div>
                 <p className={`text-lg transition-colors duration-300 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                  Počet darcov
+                  {t('pages.about.stats.donorCount')}
                 </p>
               </div>
             </div>
@@ -116,13 +122,7 @@ export default function OProjektePage() {
 
           <div className="mb-16">
             <p className={`text-lg leading-relaxed text-left transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Naša práca je možná vďaka podpore vášnivých dobrovoľníkov, štedrých darcov a 
-              komunity, ktorá sa hlboko stará o dobro zvierat. Organizujeme aj kastračné a 
-              sterilizačné iniciatívy, aby sme riešili problém túlavých psov a zabezpečili 
-              dlhodobý vplyv. V nadácii Good Boy veríme, že každý pes si zaslúži bezpečný, 
-              milujúci domov a šťastný život. Pridajte sa k nám a pomôžte nám robiť zmeny – 
-              či už dobrovoľníctvom, darovaním alebo adopciou chlpatého priateľa. Spoločne 
-              môžeme vytvoriť lepšiu budúcnosť pre psy v Žiline.
+              {t('pages.about.additionalInfo')}
             </p>
           </div>
         </div>
