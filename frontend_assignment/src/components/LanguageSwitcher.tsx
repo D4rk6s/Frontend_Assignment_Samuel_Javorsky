@@ -15,7 +15,7 @@ export const LanguageSwitcher = () => {
     <select 
       value={i18n.language} 
       onChange={(e) => changeLanguage(e.target.value)}
-      className={`px-3 py-1 rounded-lg border transition-colors duration-200 ${
+      className={`px-2 sm:px-3 py-1 rounded-lg border transition-colors duration-200 text-sm sm:text-base ${
         theme === 'dark' 
           ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600' 
           : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'

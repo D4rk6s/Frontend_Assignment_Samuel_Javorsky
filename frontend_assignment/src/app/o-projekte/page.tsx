@@ -40,12 +40,12 @@ export default function OProjektePage() {
   }, []);
   return (
     <div className={`min-h-screen transition-colors duration-300 ${theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
-      <div className="max-w-7xl mx-auto px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         <div className="mb-8">
-          <div className="flex justify-between items-start mb-4">
+          <div className="flex justify-between items-start mb-4 gap-4">
             <Link 
               href="/" 
-              className="flex items-center text-[#4F46E5] hover:text-[#3B3B9A] transition-colors text-lg"
+              className="flex items-center text-[#4F46E5] hover:text-[#3B3B9A] transition-colors text-base sm:text-lg"
             >
               <svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-2">
                 <path d="M14.6668 6H1.3335M1.3335 6L6.3335 11M1.3335 6L6.3335 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -53,11 +53,11 @@ export default function OProjektePage() {
                      {isMounted ? t('form.navigation.back') : 'Späť'}
             </Link>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <LanguageSwitcher />
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200"
+                className="p-1.5 sm:p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200"
                 title={theme === 'light' ? t('theme.toggleDark') : t('theme.toggleLight')}
               >
               {theme === 'light' ? (
@@ -74,14 +74,14 @@ export default function OProjektePage() {
             </div>
           </div>
           
-          <h1 className={`text-5xl font-bold mb-12 transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+          <h1 className={`text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-8 sm:mb-12 transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             {isMounted ? t('pages.about.title') : 'O projekte'}
           </h1>
         </div>
 
         <div className="max-w-6xl">
           <div className="mb-8">
-            <p className={`text-lg leading-relaxed mb-6 text-left transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            <p className={`text-base sm:text-lg leading-relaxed mb-6 text-left transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
               {t('pages.about.description')}
             </p>
           </div>

@@ -59,17 +59,17 @@
       "title": "Kontakt",
       "email": {
         "title": "Email",
-        "description": "Our friendly team is here to help.",
+        "description": "Náš priateľský tím je tu, aby vám pomohol.",
         "address": "hello@goodrequest.com"
       },
       "office": {
-        "title": "Office",
-        "description": "Come say hello at our office HQ.",
+        "title": "Kancelária",
+        "description": "Príďte nás pozdraviť do našej hlavnej kancelárie.",
         "address": "Obchodná 3D, 010 08 Žilina, Slovakia"
       },
       "phone": {
-        "title": "Phone",
-        "description": "Mon-Fri from 8am to 5pm.",
+        "title": "Telefón",
+        "description": "Po-Pia od 8:00 do 17:00.",
         "number": "+421 911 750 750"
       }
     },
