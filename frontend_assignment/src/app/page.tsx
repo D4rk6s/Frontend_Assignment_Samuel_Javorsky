@@ -187,7 +187,7 @@ export default function Home() {
                       <LanguageSwitcher />
                       <button
                         onClick={toggleTheme}
-                        className="p-1.5 sm:p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200"
+                        className="h-8 w-8 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center justify-center"
                         title={theme === 'light' ? t('theme.toggleDark') : t('theme.toggleLight')}
                       >
                       {theme === 'light' ? (
